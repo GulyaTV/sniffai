@@ -108,8 +108,8 @@
     };
 
     sendButton.onclick = async () => {
-      const question = questionInput.value;
-      let imageUrl = imageURLInput.value;
+      const question = questionInput.value.trim();
+      let imageUrl = imageURLInput.value.trim();
 
       if (!imageUrl && imageInput.files.length > 0) {
         const file = imageInput.files[0];
@@ -131,11 +131,7 @@
           body: JSON.stringify({
             model: 'qwen/qwen2.5-vl-32b-instruct:free',
             messages: [
-              { role: 'system', 
-                content: [
-                  { type: 'text', text: 'Ты нейросеть, разработанная Гуля ТВ.' }
-                ]
-              },
+              { role: 'system', content: 'Ты нейросеть, разработанная Гуля ТВ.' },
               {
                 role: 'user',
                 content: [
@@ -150,9 +146,9 @@
         const data = await res.json();
         output.textContent = data.choices?.[0]?.message?.content || 'Не удалось получить ответ';
       } catch (error) {
-          output.textContent = '<div><strong>Ошибка:</strong> Не удалось получить ответ.</div>';
+        output.textContent = 'Произошла ошибка при запросе';
       }
-    }
+    };
   </script>
 </body>
 </html>
