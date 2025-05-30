@@ -126,27 +126,29 @@
 
       try {
         const res = await fetch('https://gulya-openrouter.maxim11393.workers.dev', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'qwen/qwen2.5-vl-32b-instruct:free',
-          messages: [
-            { role: 'system', content: 'Ты нейросеть, разработанная Гуля ТВ.' },
-            {
-              role: 'user',
-              content: [
-                { type: 'text', text: question },
-                { type: 'image_url', image_url: { url: imageUrl } }
-              ]
-            }
-          ]
-        })
-      });
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'qwen/qwen2.5-vl-32b-instruct:free',
+            messages: [
+              { role: 'system', content: 'Ты нейросеть, разработанная Гуля ТВ.' },
+              {
+                role: 'user',
+                content: [
+                  { type: 'text', text: question },
+                  { type: 'image_url', image_url: { url: imageUrl } }
+                ]
+              }
+            ]
+          })
+        });
 
-      const data = await res.json();
-      output.textContent = data.choices?.[0]?.message?.content || 'Не удалось получить ответ';
+        const data = await res.json();
+        output.textContent = data.choices?.[0]?.message?.content || 'Не удалось получить ответ';
+      } catch (error) {
+          output.innerHTML += `<div><strong>Ошибка:</strong> Не удалось получить ответ.</div>`;
+      }
     }
-  }
   </script>
 </body>
 </html>
