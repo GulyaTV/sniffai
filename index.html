@@ -116,38 +116,32 @@
     const questionInput = document.getElementById('question');
     const output = document.getElementById('output');
     
-    let imageBlobUrl = null;
+    //let imageBlobUrl = null;
 
-    // Обработка загрузки файла
-    imageInput.addEventListener('change', function () {
-      const file = this.files[0];
-      if (file) {
-        fileNameSpan.textContent = file.name;
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          imagePreview.src = e.target.result;
-          previewContainer.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-      } else {
-        previewContainer.style.display = 'none';
-        fileNameSpan.textContent = '';
-        imagePreview.src = '';
+    let uploadedImageUrl = "";
+
+    imageInput.addEventListener("change", async () => {
+      const file = imageInput.files[0];
+      if (!file) return;
+
+      previewContainer.style.display = "block";
+      fileNameSpan.textContent = file.name;
+      imagePreview.src = URL.createObjectURL(file);
+
+      try {
+        uploadedImageUrl = await uploadImageToCloudflare(file);
+        console.log("✅ Загружено в Cloudflare:", uploadedImageUrl);
+      } catch (e) {
+        console.error("Ошибка при загрузке:", e);
+        alert("Не удалось загрузить изображение.");
       }
     });
 
-    // Обработка вставки URL
-    imageURLInput.addEventListener('input', function () {
-      const url = this.value.trim();
-      if (url) {
-        fileNameSpan.textContent = '(вставлен URL)';
-        imagePreview.src = url;
-        previewContainer.style.display = 'block';
-      } else {
-        previewContainer.style.display = 'none';
-        fileNameSpan.textContent = '';
-        imagePreview.src = '';
-      }
+    imageURLInput.addEventListener("input", () => {
+      uploadedImageUrl = imageURLInput.value;
+      previewContainer.style.display = "block";
+      fileNameSpan.textContent = "(вставлен URL)";
+      imagePreview.src = uploadedImageUrl;
     });
 
     micButton.onclick = () => {
@@ -166,10 +160,10 @@
       if (!imageUrl && imageInput.files.length > 0) {
         const file = imageInput.files[0];
         imageBlobUrl = URL.createObjectURL(file);
-        imageUrl = imageBlobUrl;
+        imageUrl = uploadedImageUrl;
       }
 
-      if (!question || !imageUrl) {
+      if (!question || !imageUrl || !uploadedImageUrl) {
         output.textContent = 'Пожалуйста, введите вопрос и выберите изображение';
         return;
       }
@@ -201,6 +195,27 @@
         output.textContent = 'Произошла ошибка при запросе';
       }
     };
+
+    async function uploadImageToCloudflare(file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('requireSignedURLs', 'false');
+
+      const response = await fetch("https://api.cloudflare.com/client/v4/accounts/5b65864a13773612d0a104d18e9ce9c8/images/v1", {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer 80cHpLSi2xE2fGGBXVwjuxcILt9fi2LW_40KT-H1"
+        },
+         body: formData
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        return result.result.variants[0];
+      } else {
+        throw new Error("Upload failed: " + JSON.stringify(result.errors));
+      }
+    }
   </script>
 </body>
 </html>
