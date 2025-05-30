@@ -193,6 +193,16 @@
       output.textContent = 'SniffAI обнюхивает...';
 
       try {
+        if (!imageUrl && imageInput.files.length > 0) {
+          const file = imageInput.files[0];
+          imageUrl = await uploadToImgur(file);
+        }
+
+        if (!imageUrl) {
+          output.textContent = "Загрузите изображение или вставьте URL.";
+          return;
+        }
+        
         const res = await fetch('https://gulya-openrouter.maxim11393.workers.dev', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
