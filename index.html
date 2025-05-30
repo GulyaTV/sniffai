@@ -131,11 +131,11 @@
           body: JSON.stringify({
             model: 'qwen/qwen-2.5-vl-7b-instruct:free',
             messages: [
-              { role: 'system', content: 'Ты нейросеть, разработанная Гуля ТВ.' },
+              //{ role: 'system', content: 'Ты нейросеть, разработанная Гуля ТВ.' },
               {
                 role: 'user',
                 content: [
-                  { type: 'text', text: question },
+                  { type: 'text', text: 'Ты нейросеть, разработанная Гуля ТВ. ' + question },
                   { type: 'image_url', image_url: { url: imageUrl } }
                 ]
               }
