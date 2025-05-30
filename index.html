@@ -67,11 +67,28 @@
     <h1>🐶 SniffAI</h1>
     <p>Покажи мне что-нибудь — я расскажу, как это работает!</p>
 
-    <input type="file" accept="image/*" id="imageInput"><br>
-    <input type="url" placeholder="...или вставь URL изображения" id="imageURLInput">
+    <!--<input type="file" accept="image/*" id="imageInput"><br>
+    <input type="url" placeholder="...или вставь URL изображения" id="imageURLInput">-->
+
+    <h2>📸 Загрузите или сделайте фото</h2>
+    <input type="file" accept="image/*" id="imageInput" capture="environment"><br>
+    <input type="url" placeholder="...или вставьте URL изображения" id="imageURLInput">
+
+    <div id="previewContainer" style="margin-top: 10px; display: none;">
+      <p><strong>Файл:</strong> <span id="fileName"></span></p>
+      <img id="imagePreview" src="" alt="Предпросмотр изображения" style="max-width: 100%; border-radius: 10px; margin-top: 5px;" />
+    </div>
+
+    <h2>💬 Задайте вопрос</h2>
+    <datalist id="suggestions">
+      <option value="Что на фото?">
+      <option value="Переведи текст на фото">
+      <option value="Как работает этот объект?">
+      <option value="Что это за животное?">
+    </datalist>
 
     <div class="input-row">
-      <textarea id="question" rows="2" placeholder="Что ты хочешь узнать?"></textarea>
+      <textarea id="question" rows="2" placeholder="Что ты хочешь узнать?" list="suggestions"></textarea>
       <button aria-label="Кнопка диктовки" type="button" class="composer-btn" id="micButton">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M11.165 4.41699C11.165 3.22048 10.1955 2.25018 8.99902 2.25C7.80241 2.25 6.83203 3.22038 6.83203 4.41699V8.16699C6.83221 9.36346 7.80252 10.333 8.99902 10.333C10.1954 10.3328 11.1649 9.36335 11.165 8.16699V4.41699Z" fill="currentColor"/>
@@ -89,14 +106,49 @@
   </div>
 
   <script>
+    const imageInput = document.getElementById('imageInput');
+    const imageURLInput = document.getElementById('imageURLInput');
+    const previewContainer = document.getElementById('previewContainer');
+    const fileNameSpan = document.getElementById('fileName');
+    const imagePreview = document.getElementById('imagePreview');
     const sendButton = document.getElementById('sendButton');
     const micButton = document.getElementById('micButton');
     const questionInput = document.getElementById('question');
-    const imageInput = document.getElementById('imageInput');
-    const imageURLInput = document.getElementById('imageURLInput');
     const output = document.getElementById('output');
-
+    
     let imageBlobUrl = null;
+
+    // Обработка загрузки файла
+    imageInput.addEventListener('change', function () {
+      const file = this.files[0];
+      if (file) {
+        fileNameSpan.textContent = file.name;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          imagePreview.src = e.target.result;
+          previewContainer.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        previewContainer.style.display = 'none';
+        fileNameSpan.textContent = '';
+        imagePreview.src = '';
+      }
+    });
+
+    // Обработка вставки URL
+    imageURLInput.addEventListener('input', function () {
+      const url = this.value.trim();
+      if (url) {
+        fileNameSpan.textContent = '(вставлен URL)';
+        imagePreview.src = url;
+        previewContainer.style.display = 'block';
+      } else {
+        previewContainer.style.display = 'none';
+        fileNameSpan.textContent = '';
+        imagePreview.src = '';
+      }
+    });
 
     micButton.onclick = () => {
       const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
