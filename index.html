@@ -131,7 +131,11 @@
           body: JSON.stringify({
             model: 'qwen/qwen2.5-vl-32b-instruct:free',
             messages: [
-              { role: 'system', content: 'Ты нейросеть, разработанная Гуля ТВ.' },
+              { role: 'system', 
+                content: [
+                  { type: 'text', text: 'Ты нейросеть, разработанная Гуля ТВ.' }
+                ]
+              },
               {
                 role: 'user',
                 content: [
@@ -146,7 +150,7 @@
         const data = await res.json();
         output.textContent = data.choices?.[0]?.message?.content || 'Не удалось получить ответ';
       } catch (error) {
-          output.innerHTML += `<div><strong>Ошибка:</strong> Не удалось получить ответ.</div>`;
+          output.textContent = '<div><strong>Ошибка:</strong> Не удалось получить ответ.</div>';
       }
     }
   </script>
