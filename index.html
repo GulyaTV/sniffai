@@ -124,7 +124,8 @@
 
       output.textContent = 'SniffAI обнюхивает...';
 
-      const res = await fetch('https://gulya-openrouter.maxim11393.workers.dev', {
+      try {
+        const res = await fetch('https://gulya-openrouter.maxim11393.workers.dev', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
